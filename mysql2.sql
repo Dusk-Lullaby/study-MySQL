@@ -73,5 +73,58 @@ SELECT * FROM course WHERE `number` IN(1,3,5);
 -- 查询课程编号为1，3，5,10,12的课程信息
 SELECT * FROM course WHERE `number` IN(1,3,5,10,12);
 
+-- 数据表准备：新建学生表student，
+-- 包含字段学号（no），类型为长整数，长度为20，是主键，非空；
+-- 姓名（name），类型为字符串，长度为20，非空；
+-- 性别（sex），类型为字符串，长度为2，默认为男；
+-- 年龄（age），类型为整数，长度为3，默认值为0；
+-- 成绩（score），类型为浮点数，长度为5，小数点后面保留2位有效数字
+DROP TABLE IF EXISTS student;
+CREATE TABLE student(
+	`no` BIGINT(20)  AUTO_INCREMENT PRIMARY KEY NOT NULL COMMENT '学号',
+	name VARCHAR(20) NOT NULL COMMENT '姓名',
+	sex VARCHAR(2) DEFAULT '男' COMMENT '性别',
+	age INT(3) DEFAULT 0 COMMENT '年龄',
+	score DOUBLE(5, 2) COMMENT '成绩'
+) ENGINE=InnoDB CHARSET=UTF8 COMMENT='学生表';
+
+INSERT INTO student(no, name, sex, age, score) VALUES (DEFAULT, '张三', '男', 20, 59);
+INSERT INTO student(no, name, sex, age, score) VALUES (DEFAULT, '李四', '女', 19, 62);
+INSERT INTO student(no, name, sex, age, score) VALUES (DEFAULT, '王五', '其他', 21, 62);
+INSERT INTO student(no, name, sex, age, score) VALUES (DEFAULT, '龙华', '男', 22, 75);
+INSERT INTO student(no, name, sex, age, score) VALUES (DEFAULT, '金凤', '女', 18, 80);
+INSERT INTO student(no, name, sex, age, score) VALUES (DEFAULT, '张华', '其他', 27, 88);
+INSERT INTO student(no, name, sex, age, score) VALUES (DEFAULT, '李刚', '男', 28, 81);
+INSERT INTO student(no, name, sex, age, score) VALUES (DEFAULT, '潘玉明', '女', 28, 81);
+INSERT INTO student(no, name, sex, age, score) VALUES (DEFAULT, '凤飞飞', '其他', 32, 90);
 
 
+-- 从学生表查询成绩在80分以上的学生并按性别分组
+SELECT * FROM student WHERE score>80 GROUP BY sex;
+-- 从学生表查询成绩在60~80之间的学生并按性别和年龄分组
+SELECT * FROM student WHERE score>=60 AND score<=80 GROUP BY sex, age;
+
+-- 从学生表查询80分以上的学生人数
+SELECT COUNT(*) total FROM student WHERE score>80;
+-- 从学生表查询不及格的学生的人数和总成绩
+SELECT COUNT(*) totalCount, SUM(score) totalScore FROM student WHERE score<60;
+-- 从学生表查询男生、女生、其他类型的学生的平均成绩
+SELECT sex, AVG(score) averageScore FROM student GROUP BY sex;
+-- 从学生表查询学生的最大年龄
+SELECT MAX(age) FROM student;
+-- 从学生表中查询学生的最低分
+SELECT MIN(score) FROM student;
+
+-- 从学生表查询年龄在20~30之间的学生信息并按性别分组，
+-- 找出组内平均分在74分以上的组
+SELECT * FROM student WHERE age BETWEEN 20 AND 30 GROUP BY sex HAVING AVG(score)>74;
+
+-- 从学生表查询年龄在18~30之间的学生信息
+-- 并按成绩从高到低排列，如果成绩相同，则按年龄从小到大排列
+SELECT * FROM student WHERE age BETWEEN 18 AND 30 ORDER BY score DESC, age ASC;
+
+-- 从学生表分页查询成绩及格的同学信息，
+-- 每页显示3条，查询第二页学生信息
+SELECT * FROM student WHERE score>=60 LIMIT 0, 3;	-- 第一个参数是偏移量，也就是跳过的行数
+SELECT * FROM student WHERE score>=60 LIMIT 3, 3;
+SELECT * FROM student WHERE score>=60 LIMIT 6, 3;
